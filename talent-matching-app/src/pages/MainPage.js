@@ -4,27 +4,25 @@ import { useNavigate } from 'react-router-dom';
 import ProfileCard from '../components/ProfileCard'; 
 import axios from 'axios'; 
 
-import BackgroundImage from '../assets/1.jpeg'; 
+// ❌ 배경 이미지 import 제거됨
 
 // =====================================
-// ✅ Styled Components 정의 (모바일 규격 포함)
+// ✅ Styled Components 정의 (배경색 수정 & 모바일 규격)
 // =====================================
 
 const HeroSection = styled.div`
-  background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
-                    url(${BackgroundImage});
-  background-size: cover;
-  background-position: center;
+  /* 💡 배경 이미지 대신 화사한 핑크빛 그라데이션 적용 */
+  background: linear-gradient(135deg, #fff0f6 0%, #ffe3e3 100%);
+  width: 100%;
   height: 100vh; 
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: white;
   text-align: center;
 
   @media (max-width: 768px) {
-    height: 70vh; /* 💡 모바일: 화면 높이 축소 */
+    height: 70vh; /* 모바일 높이 조정 */
     padding: 0 15px;
   }
 `;
@@ -32,24 +30,23 @@ const HeroSection = styled.div`
 const Title = styled.h1`
   font-size: 3.5em; 
   font-weight: bold;
-  color: #FFD95A; 
+  color: #D64560; /* 💡 밝은 배경에 맞춰 브랜드 컬러로 변경 */
   margin-bottom: 15px;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
+  /* text-shadow 제거 */
 
   @media (max-width: 768px) {
-    font-size: 2.2em; /* 💡 모바일: 폰트 크기 축소 */
+    font-size: 2.2em;
     margin-bottom: 10px;
   }
 `;
 
 const Subtitle = styled.p`
   font-size: 1.2em;
-  color: #eee;
+  color: #555; /* 💡 가독성을 위해 진한 회색으로 변경 */
   margin-bottom: 40px;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 
   @media (max-width: 768px) {
-    font-size: 1em; /* 💡 모바일: 폰트 크기 축소 */
+    font-size: 1em;
     margin-bottom: 25px;
   }
 `;
@@ -62,7 +59,7 @@ const StartButton = styled.button`
   border-radius: 50px;
   font-size: 1.1em;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* 그림자 부드럽게 조정 */
   transition: all 0.3s ease;
   
   &:hover {
@@ -71,7 +68,7 @@ const StartButton = styled.button`
   }
 
   @media (max-width: 768px) {
-    padding: 10px 25px; /* 💡 모바일: 버튼 크기 축소 */
+    padding: 10px 25px;
     font-size: 1em;
   }
 `;
@@ -79,11 +76,11 @@ const StartButton = styled.button`
 const RandomProfilesSection = styled.section`
   width: 100%;
   padding: 60px 20px;
-  background-color: #f8f8f8;
+  background-color: #ffffff; /* 배경색 흰색 */
   text-align: center;
 
   @media (max-width: 768px) {
-    padding: 30px 10px; /* 💡 모바일: 상하 여백 축소 */
+    padding: 30px 10px;
   }
 `;
 
@@ -102,7 +99,7 @@ const SectionTitle = styled.h2`
   }
   
   @media (max-width: 768px) {
-    font-size: 1.5em; /* 💡 모바일: 섹션 제목 축소 */
+    font-size: 1.5em;
     margin-bottom: 30px;
   }
 `;
@@ -119,11 +116,10 @@ const CardContainer = styled.div`
   }
 `;
 
-// 💡 지도와 게시물 결합 섹션 스타일
 const CombinedSection = styled.section`
   width: 100%;
   padding: 60px 20px;
-  background-color: #ffffff;
+  background-color: #f9f9f9; /* 구분감을 위한 연한 회색 배경 */
   text-align: center;
 
   @media (max-width: 768px) {
@@ -140,13 +136,12 @@ const CombinedContent = styled.div`
   text-align: left; 
 
   @media (max-width: 1024px) {
-    flex-direction: column; /* 💡 1024px 이하: 세로로 배치 (모바일/태블릿 규격) */
+    flex-direction: column; /* 모바일/태블릿: 세로 배치 */
     align-items: center;
     gap: 20px;
   }
 `;
 
-// 💡 왼쪽 (지도) 섹션 스타일
 const MapContainer = styled.div`
   flex: 1; 
   min-width: 300px;
@@ -164,7 +159,6 @@ const MapContainer = styled.div`
   }
 `;
 
-// 💡 오른쪽 (게시물) 섹션 스타일
 const PostsContainer = styled.div`
   flex: 1; 
   min-width: 300px;
@@ -230,21 +224,24 @@ const MainPage = () => {
 
   useEffect(() => {
     const fetchRandomProfiles = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // API 연결 부분: DB 오류 해결 시 이곳에서 실제 데이터가 로드됩니다.
-        const response = await axios.get('/api/profiles/random'); 
-        setRandomProfiles(response.data); 
-        
-      } catch (err) {
-        console.error("API 요청 오류:", err);
-        setError("프로필 데이터를 불러오는 데 실패했습니다. (서버/DB 연결 확인 필요)");
-        
-      } finally {
-        setLoading(false);
-      }
+       
+       // 💡 화면 멈춤 방지: API 통신 대신 즉시 로딩 완료 처리
+       setLoading(false); 
+       setError(null);
+       setRandomProfiles([]); // 데이터는 비워둠 (UI 렌더링 우선)
+       
+       /* 추후 백엔드 연동 시 주석 해제할 코드
+       try {
+         setLoading(true);
+         const response = await axios.get('/api/profiles/random'); 
+         setRandomProfiles(response.data); 
+       } catch (err) {
+         console.error(err);
+         setError("프로필 데이터를 불러오지 못했습니다.");
+       } finally {
+         setLoading(false);
+       }
+       */
     };
 
     fetchRandomProfiles();
@@ -253,6 +250,7 @@ const MainPage = () => {
 
   return (
     <>
+      {/* 1. 히어로 섹션 (이미지 제거됨) */}
       <HeroSection>
         <Title>만남은 재능</Title>
         <Subtitle>세상의 숨겨진 재능을 연결하고, 당신의 가치를 공유하세요.</Subtitle>
@@ -261,16 +259,20 @@ const MainPage = () => {
         </StartButton>
       </HeroSection>
 
-      {/* 1. 주목할 만한 재능 (기존 랜덤 프로필 섹션) */}
+      {/* 2. 주목할 만한 재능 (랜덤 프로필) */}
       <RandomProfilesSection>
         <SectionTitle>주목할 만한 재능</SectionTitle>
         <CardContainer>
-          {/* 로딩 및 오류 상태 표시 */}
           {loading && <p>프로필을 불러오는 중입니다...</p>}
           {error && <p style={{color: 'red'}}>{error}</p>}
           
-          {/* API에서 데이터를 성공적으로 가져왔을 때 렌더링 */}
-          {!loading && !error && randomProfiles.length > 0 ? (
+          {/* 데이터가 없을 때 표시할 문구 */}
+          {!loading && !error && randomProfiles.length === 0 && (
+             <p style={{color: '#888'}}>현재 주목할 만한 재능 프로필이 없습니다.</p>
+          )}
+          
+          {/* 데이터가 있을 때 렌더링 */}
+          {!loading && !error && randomProfiles.length > 0 && (
             randomProfiles.slice(0, 3).map(profile => ( 
               <ProfileCard
                 key={profile._id || profile.id} 
@@ -280,19 +282,16 @@ const MainPage = () => {
                 imageUrl={profile.profilePictureUrl || 'https://via.placeholder.com/100'}
               />
             ))
-          ) : (
-             !loading && !error && <p>현재 주목할 만한 재능 프로필이 없습니다.</p>
           )}
-
         </CardContainer>
       </RandomProfilesSection>
       
-      {/* 2. 💡 지도와 게시물이 결합된 섹션 */}
+      {/* 3. 지도와 게시물 결합 섹션 */}
       <CombinedSection>
           <SectionTitle>가까운 재능 & 최신 소식</SectionTitle>
           <CombinedContent>
               
-              {/* 2-A. 왼쪽: 약도 자리 확보 (MapContainer) */}
+              {/* 3-A. 왼쪽: 약도 자리 */}
               <MapContainer>
                   <h3 style={{color: '#333', marginBottom: '15px'}}>가까운 재능 찾기</h3>
                   <p style={{ height: '350px', backgroundColor: '#e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', color: '#555', textAlign: 'center' }}>
@@ -300,7 +299,7 @@ const MainPage = () => {
                   </p>
               </MapContainer>
 
-              {/* 2-B. 오른쪽: 최신 게시물 목록 (PostsContainer) */}
+              {/* 3-B. 오른쪽: 최신 게시물 목록 */}
               <PostsContainer>
                   <h3 style={{color: '#333', marginBottom: '15px', textAlign: 'center'}}>최신 등록된 재능 게시물</h3>
                   <PostList>
